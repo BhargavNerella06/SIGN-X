@@ -12,7 +12,7 @@ services:
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    plan: standard            # 1 CPU / 2 GB — see docs/deployment.md "Sizing"
+    plan: Free            # 1 CPU / 2 GB — see docs/deployment.md "Sizing"
     region: singapore         # closest Render region to India: lowest WebSocket RTT
     healthCheckPath: /api/health
     envVars:
