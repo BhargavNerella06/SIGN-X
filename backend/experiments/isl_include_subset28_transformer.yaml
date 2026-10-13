@@ -1,0 +1,94 @@
+# SIGN-X Stage 2 Temporal Transformer experiment — identical to isl_include_subset28_bilstm.yaml except model.type.
+#
+# Dataset: INCLUDE (AI4Bharat / IIT Madras), CC-BY-4.0.
+#   Metadata: https://huggingface.co/datasets/ai4bharat/INCLUDE
+#   Videos:   https://zenodo.org/records/4010759
+# Categories used: Greetings (9 classes), Pronouns (8 classes), Colours (11
+# classes) = 28 classes total, chosen because they have solid per-class
+# sample counts (20-42 videos/class) and fit comfortably in this
+# environment's download budget (~7.9 GB vs. the full dataset's ~57 GB).
+# See docs/dataset.md "Stage 2: INCLUDE subset" for full provenance,
+# licensing and the exact download commands used.
+#
+# This file is committed as a REPRODUCIBILITY record: the exact class
+# list, split, and hyperparameters used for the Stage 2 result reported in
+# docs/model.md. Do not edit it after training — copy it if you want to
+# run a variant.
+
+dataset:
+  name: isl_include_subset28
+  dataset_path: datasets                       # -> backend/datasets/isl_include_subset28/{train,validation,test}
+  sequence_length: 32
+  use_velocity_features: false
+
+  # --- adapter-specific (training/datasets/include.py) ---
+  adapter: include
+  video_root: datasets/_include_zips/extracted   # where the downloaded Zenodo zips were extracted
+  metadata_dir: datasets/_include_meta           # HuggingFace parquet metadata (train/val/test.parquet)
+  include_50_only: false
+  max_samples_per_class: null                    # use all available samples per class
+  subset_classes:
+    # Greetings (9)
+    - HELLO
+    - GOOD_MORNING
+    - THANK_YOU
+    - GOOD_AFTERNOON
+    - ALRIGHT
+    - HOW_ARE_YOU
+    - GOOD_EVENING
+    - GOOD_NIGHT
+    - PLEASED
+    # Pronouns (8)
+    - I
+    - IT
+    - YOU_PLURAL
+    - YOU
+    - SHE
+    - HE
+    - WE
+    - THEY
+    # Colours (11)
+    - RED
+    - BLACK
+    - WHITE
+    - BROWN
+    - GREY
+    - BLUE
+    - GREEN
+    - ORANGE
+    - PINK
+    - YELLOW
+    - COLOUR
+
+model:
+  type: transformer          # Temporal Transformer variant of isl_include_subset28_bilstm.yaml (only this line differs)
+  embedding_dim: 128
+  transformer_layers: 4
+  transformer_heads: 4
+  transformer_ff_dim: 256
+  bilstm_hidden_dim: 128
+  bilstm_layers: 2
+  dropout: 0.3                # slightly higher than the default demo config — small real dataset, higher overfitting risk
+
+training:
+  batch_size: 16
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  epochs: 60
+  early_stopping_patience: 10
+  lr_scheduler_patience: 5
+  lr_scheduler_factor: 0.5
+  device: auto
+  seed: 42
+  checkpoint_dir: models
+  log_dir: training/logs/isl_include_subset28
+  use_class_weights: true     # Section 8: classes range 20-42 samples, not extreme but non-trivial imbalance
+
+augmentation:
+  enabled: true
+  gaussian_noise_std: 0.01
+  rotation_degrees: 5.0
+  scale_range: [0.95, 1.05]
+  translation_std: 0.01
+  temporal_crop_ratio: 0.1
+  frame_drop_prob: 0.05

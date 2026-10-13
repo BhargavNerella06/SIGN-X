@@ -1,0 +1,56 @@
+# --- Python / backend ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# --- Datasets (never commit raw videos, downloads or extracted features) ---
+backend/datasets/raw/*
+!backend/datasets/raw/.gitkeep
+backend/datasets/processed/
+backend/datasets/_include_zips/
+backend/datasets/_include_meta/
+backend/datasets/*/train/
+backend/datasets/*/validation/
+backend/datasets/*/test/
+backend/datasets/*/class_mapping.json
+
+# --- Models ---
+# The two trained checkpoints (~5.8 MB) and classes.json ARE committed: the
+# deployed backend needs them. The MediaPipe asset is downloaded instead
+# (scripts/download_models.*, backend/Dockerfile verifies its checksum).
+backend/models/*.pth
+backend/models/mediapipe/*.task
+
+# --- Training runs: keep only the recorded evaluation results ---
+backend/training/logs/**
+!backend/training/logs/**/
+!backend/training/logs/isl_include_subset28/evaluation_results_*.json
+backend/training/config.smoketest*.yaml
+
+# --- Node / frontend ---
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.local
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key

@@ -1,0 +1,42 @@
+# SIGN-X training configuration.
+# All fields here override the matching default in app/config.py for the
+# duration of a training/evaluation run. Nothing in training/*.py should
+# hardcode these values outside of this file.
+
+dataset:
+  name: isl_demo               # subfolder under dataset_path
+  dataset_path: datasets       # relative to backend/
+  sequence_length: 32
+  use_velocity_features: false
+
+model:
+  type: transformer            # "transformer" or "bilstm"
+  embedding_dim: 128
+  transformer_layers: 4
+  transformer_heads: 4
+  transformer_ff_dim: 256
+  bilstm_hidden_dim: 128
+  bilstm_layers: 2
+  dropout: 0.2
+
+training:
+  batch_size: 16
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  epochs: 50
+  early_stopping_patience: 8
+  lr_scheduler_patience: 4
+  lr_scheduler_factor: 0.5
+  device: auto                 # auto | cuda | cpu
+  seed: 42
+  checkpoint_dir: models       # relative to backend/
+  log_dir: training/logs
+
+augmentation:
+  enabled: true
+  gaussian_noise_std: 0.01
+  rotation_degrees: 5.0
+  scale_range: [0.95, 1.05]
+  translation_std: 0.01
+  temporal_crop_ratio: 0.1     # max fraction of frames randomly cropped from each end
+  frame_drop_prob: 0.05        # per-frame probability of being dropped (then re-padded)

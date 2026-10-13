@@ -1,0 +1,11 @@
+.env
+.venv/
+venv/
+**/__pycache__/
+**/*.pyc
+.pytest_cache/
+datasets/
+training/logs/
+tests/
+benchmarks/
+models/mediapipe/*.task

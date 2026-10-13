@@ -1,0 +1,40 @@
+# Render Blueprint for SIGN-X — two services:
+#   signx-api : FastAPI inference backend (Docker, see backend/Dockerfile)
+#   signx-web : React/Vite frontend (static site)
+#
+# The webcam and speech stay in the user's browser; only JPEG frames travel
+# to signx-api over a wss:// WebSocket. See docs/deployment.md before applying:
+# the two `sync: false` variables must be filled in, and the plan sizing there
+# is based on measured CPU/RAM needs (Free/Starter are too small).
+services:
+  - type: web
+    name: signx-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: standard            # 1 CPU / 2 GB — see docs/deployment.md "Sizing"
+    region: singapore         # closest Render region to India: lowest WebSocket RTT
+    healthCheckPath: /api/health
+    envVars:
+      # JSON list with the exact frontend origin, e.g. ["https://signx-web.onrender.com"]
+      - key: SIGNX_CORS_ORIGINS
+        sync: false
+
+  - type: web
+    name: signx-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      # Client-side routing (react-router): serve index.html for every path.
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      # Backend origin, e.g. https://signx-api.onrender.com — baked in at build
+      # time; the WebSocket URL (wss://…/ws/predict) is derived from it.
+      - key: VITE_API_BASE_URL
+        sync: false
